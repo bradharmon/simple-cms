@@ -9,7 +9,7 @@
 //****INCLUDE GLOBALS*******************************************************************
 
 include("sqlStrings.php");
-include("settings.php");
+#include("settings.php");
 
 foreach($_POST as $key => $value)
 {
