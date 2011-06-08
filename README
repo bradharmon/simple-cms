@@ -1,0 +1,12 @@
+This is eventually going to be a simple cms that uses HTML templates 
+and some setup scripts to automatically generate the proper mysql tables 
+and php code to display and edit a website.
+
+Already completed:
+1. integrate WysiHat into a page so that any div with class="editor" can be edited
+   and sent to the server to be processed (example - editor.php)
+
+Goals:
+1. create server side code that saves POSTed div contents to the database
+2. create server side code that reads an HTML template that automatically generates mysql tables
+3. create server side code that auto-generate php files that allow viewing and editing of the site
