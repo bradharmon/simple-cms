@@ -16,6 +16,17 @@ foreach($_POST as $key => $value)
    echo "$key => $value<br/>\n";
 }
 
+$page = mysql_real_escape_string("editor");
+$div_id = mysql_real_escape_string($_POST['div_id']);
+$content = mysql_real_escape_string($_POST['content']);
+$query = "INSERT INTO regions (page, div_id, content) VALUES (\"$page\", \"$div_id\", \"$content\")";
+$result = @mysql_query($query);
+if(!$result)
+{
+   echo 'query: '.$query. '<br/>';
+   echo 'mysql error: '. mysql_error();
+}
+
 ?>	
 </body>
 </html>
