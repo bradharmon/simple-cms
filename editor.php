@@ -1,5 +1,16 @@
 <?php
-include("sqlStrings.php");
+include("includes/sqlStrings.php");
+
+function get_region_from_db($page, $id)
+{
+   $page = mysql_real_escape_string($page);
+   $id = mysql_real_escape_string($id);
+
+   $query = "SELECT content FROM regions WHERE page = \"$page\" AND div_id = \"$id\" ORDER by id DESC LIMIT 1";
+   $result = mysql_query($query);
+   $row = mysql_fetch_row($result);
+   return $row[0];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,17 +26,9 @@ include("sqlStrings.php");
 
 <body>
 <?php
-$query = "SELECT content FROM regions WHERE page = \"editor\" AND div_id = \"div1\" ORDER by id DESC LIMIT 1";
-$result = mysql_query($query);
-$row = mysql_fetch_row($result);
-$div1 = $row[0];
-$query = "SELECT content FROM regions WHERE page = \"editor\" AND div_id = \"div3\" ORDER by id DESC LIMIT 1";
-$result = mysql_query($query);
-$row = mysql_fetch_row($result);
-$div3 = $row[0];
-    echo '<div id="div1" class="editor">'.$div1.'</div>';
+    echo '<div id="div1" class="editor">'. get_region_from_db("templates/index.html", "div1") .'</div>';
     echo '<div id="div2">div2 text</div>';
-    echo '<div id="div3" class="editor">'.$div3.'</div>';
+    echo '<div id="div3" class="editor">'. get_region_from_db("templates/index.html", "div3") .'</div>';
 ?>
 </body>
 </html>
