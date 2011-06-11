@@ -6,7 +6,7 @@
 <body>
 <?php
  
-include("includes/sqlStrings.php");
+include("sqlStrings.php");
 #include("includes/settings.php");
 
 foreach($_POST as $key => $value)
@@ -14,7 +14,7 @@ foreach($_POST as $key => $value)
    echo "$key => $value<br/>\n";
 }
 
-$page = mysql_real_escape_string("templates/index.html");
+$page = mysql_real_escape_string("../templates/index.html");
 $div_id = mysql_real_escape_string($_POST['div_id']);
 $content = mysql_real_escape_string($_POST['content']);
 $query = "INSERT INTO regions (page, div_id, content) VALUES (\"$page\", \"$div_id\", \"$content\")";
