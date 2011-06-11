@@ -31,7 +31,7 @@ document.observe("dom:loaded", function() {
         var textarea = '<textarea id="content" name="content" style="display:none;"></textarea>';
         var extra_info = '<input type="hidden" name="div_id" value="' + id.identify() + '" />';
         $(id).insert({after: textarea});
-        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'test.php', 'method':'post'});
+        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/test.php', 'method':'post'});
         Element.wrap($('content'), form);
         $('content').insert({after: extra_info});
         var cancel = '<button onclick="location.reload(true);" type="button">Cancel</button>';
