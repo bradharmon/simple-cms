@@ -1,5 +1,5 @@
 <?php
-include("includes/sqlStrings.php");
+include("php/sqlStrings.php");
 
 function get_region_from_db($page, $id)
 {
