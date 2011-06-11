@@ -29,7 +29,9 @@ document.observe("dom:loaded", function() {
         
         //create form around current div
         var textarea = '<textarea id="content" name="content" style="display:none;"></textarea>';
-        var extra_info = '<input type="hidden" name="div_id" value="' + id.identify() + '" />';
+        var div_id = '<input type="hidden" name="div_id" value="' + id.identify() + '" />\n';
+	var page_url = '<input type="hidden" name="page" value="' + document.location.href + '" />';
+	var extra_info = div_id + page_url;
         $(id).insert({after: textarea});
         var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/test.php', 'method':'post'});
         Element.wrap($('content'), form);
