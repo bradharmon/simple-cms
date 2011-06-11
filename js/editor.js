@@ -33,7 +33,7 @@ document.observe("dom:loaded", function() {
 	var page_url = '<input type="hidden" name="page" value="' + document.location.href + '" />';
 	var extra_info = div_id + page_url;
         $(id).insert({after: textarea});
-        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/test.php', 'method':'post'});
+        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/submit.php', 'method':'post'});
         Element.wrap($('content'), form);
         $('content').insert({after: extra_info});
         var cancel = '<button onclick="location.reload(true);" type="button">Cancel</button>';
