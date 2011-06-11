@@ -3,8 +3,7 @@ and some setup scripts to automatically generate the proper mysql tables
 and php code to display and edit a website.
 
 TODO:
-1. create php code from template
-2. figure out how to send page name when content is submitted
+1. fix boogs!!
 
 Already completed:
 1. integrate WysiHat into a page so that any div with class="editor" can be edited
@@ -12,6 +11,10 @@ Already completed:
 2. create server side code that saves POSTed div contents to the database
    (crudely done at this point - proof of concept)
 3. create server side code that reads an HTML template that automatically generates mysql tables
+4. create server side code that auto-generate php files that allow viewing and editing of the site
 
 Goals:
-2. create server side code that auto-generate php files that allow viewing and editing of the site
+1. Add features:
+   -cms editor history
+   -edit in html mode
+   -log in to edit
