@@ -166,23 +166,28 @@ if (is_dir($dir))
 	    $new_dir = dirname($new_dir);
             $new_file = preg_replace('/^..\/templates\//','../', $file);
 	    $new_file = preg_replace('/html$/', 'php', $new_file);
-            echo "old file: $file\n";
-	    echo "new dir: $new_dir\n";
-            echo "new file: $new_file\n";
             make_new_dir($new_dir);
+	    #echo "write file: $new_file\n";
             if(!file_put_contents($new_file, $php_page))
             {
                echo "could not write file: " . $new_file;
             }
+	    else
+	    {
+	       #clear out after successfully writing file
+               $php_page = "";
+	    }
 	 }
 	 #copy non-html file to correct location
 	 else if (filetype($file) == "file" && !preg_match('/html$/', $file))
 	 {
             $new_dir = preg_replace('/^..\/templates\//','../', $file);
-            $new_dir = preg_replace('/\/.*$(?!.*$)/', '/', $new_dir);
+	    $new_dir = dirname($new_dir);
+            $new_file = preg_replace('/^..\/templates\//','../', $file);
             $new_file = preg_replace('/html$/', 'php', $file);
             make_new_dir($new_dir);
 
+            #echo "copy file: $file to $new_file\n";
             if(!copy($file, $new_file))
 	    {
                echo "could not copy file: '$file' to new destination: $new_file\n";
