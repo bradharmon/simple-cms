@@ -71,6 +71,46 @@ function insert_scripts($dom)
 }
 
 #==================================================================
+#dir_to_array
+#==================================================================
+function dir_to_array($directory, $recursive = true) {
+	$array_items = array();
+	if ($handle = opendir($directory)) {
+		while (false !== ($file = readdir($handle))) {
+			if ($file != "." && $file != "..") {
+				if (is_dir($directory. "/" . $file)) {
+					if($recursive) {
+						$array_items = array_merge($array_items, dir_to_array($directory. "/" . $file, $recursive));
+					}
+					$file = $directory . "/" . $file;
+					$array_items[] = preg_replace("/\/\//si", "/", $file);
+				} else {
+					$file = $directory . "/" . $file;
+					$array_items[] = preg_replace("/\/\//si", "/", $file);
+				}
+			}
+		}
+		closedir($handle);
+	}
+	return $array_items;
+}
+
+#==================================================================
+#make_new_dir
+#==================================================================
+function make_new_dir($new_dir)
+{
+   if(!is_dir($new_dir))
+   {
+      #make dir with permissions of 0744 and allow nested directory creation
+      if(!mkdir($new_dir, 0744, true))
+      {
+         echo "could not create directory: $new_dir\n";
+      }
+   }
+}
+
+#==================================================================
 #MAIN
 #==================================================================
 #parse through all files and subdirectories in the templates folder
@@ -86,14 +126,14 @@ if (is_dir($dir))
 {
    if ($dh = opendir($dir))
    {
-      while (($file = readdir($dh)) !== false)
+      $dir_tree = dir_to_array($dir);
+      foreach ($dir_tree as $file)
       {
-         #echo "filename: $file : filetpye: " . filetype($dir . $file) . "<br/>\n";
-	 if(filetype($dir . $file) == "file")
+         #echo "filename: $file : filetpye: " . filetype($file) . "<br/>\n";
+	 if(filetype($file) == "file" && preg_match('/html$/', $file))
 	 {
-            #$html = file($dir . $file);
 	    #add our scripts in the <head>
-            $dom = file_get_html($dir . $file);
+            $dom = file_get_html($file);
 	    $html = insert_scripts($dom);
 	    foreach($html as $line)
 	    {
@@ -105,8 +145,8 @@ if (is_dir($dir))
 	       }
 	       else if ($tr_line == "<!--END EDITABLE REGION-->")
 	       {
-                  add_region_to_db($dir . $file, $editable_region);
-		  add_div_to_php($dir . $file, $editable_region);
+                  add_region_to_db($file, $editable_region);
+		  add_div_to_php($file, $editable_region);
 		  $editable_region = "";
 		  $inside_editable_region = false;
 	       }
@@ -121,11 +161,36 @@ if (is_dir($dir))
 	          $php_page .= $line . "\n";
 	       }
 	    }
-	    #FIXME: create proper file and directory structure
-	    file_put_contents("../index.php", $php_page);
+	    #write out new php files
+            $new_dir = preg_replace('/^..\/templates\//','../', $file);
+	    $new_dir = dirname($new_dir);
+            $new_file = preg_replace('/^..\/templates\//','../', $file);
+	    $new_file = preg_replace('/html$/', 'php', $new_file);
+            echo "old file: $file\n";
+	    echo "new dir: $new_dir\n";
+            echo "new file: $new_file\n";
+            make_new_dir($new_dir);
+            if(!file_put_contents($new_file, $php_page))
+            {
+               echo "could not write file: " . $new_file;
+            }
+	 }
+	 #copy non-html file to correct location
+	 else if (filetype($file) == "file" && !preg_match('/html$/', $file))
+	 {
+            $new_dir = preg_replace('/^..\/templates\//','../', $file);
+            $new_dir = preg_replace('/\/.*$(?!.*$)/', '/', $new_dir);
+            $new_file = preg_replace('/html$/', 'php', $file);
+            make_new_dir($new_dir);
+
+            if(!copy($file, $new_file))
+	    {
+               echo "could not copy file: '$file' to new destination: $new_file\n";
+	    }
 	 }
       }
       closedir($dh);
    }
 }
 ?>
+
