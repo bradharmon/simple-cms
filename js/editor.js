@@ -26,21 +26,20 @@ document.observe("dom:loaded", function() {
       if(!editor_visible){
         editor = $(id);
         editor.contentEditable = true;
-        
-        //create form around current div
-        var textarea = '<textarea id="content" name="content" style="display:none;"></textarea>';
-        var div_id = '<input type="hidden" name="div_id" value="' + id.identify() + '" />\n';
-	var page_url = '<input type="hidden" name="page" value="' + document.location.href + '" />';
-	var extra_info = div_id + page_url;
-        $(id).insert({after: textarea});
-        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/submit.php', 'method':'post'});
-        Element.wrap($('content'), form);
-        $('content').insert({after: extra_info});
-        var cancel = '<button onclick="location.reload(true);" type="button">Cancel</button>';
-        var submit = '<input onclick="save();" type="submit" name="submit" value="Submit" />';
-        form.insert({after: cancel});
-        form.insert({after: submit});
 
+        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/submit.php', 'method':'post'});
+
+        var textarea = '<textarea id="content" name="content" style="display:none;"></textarea>\n';
+        var div_id = '<input type="hidden" name="div_id" value="' + id.identify() + '" />\n';
+	var page_url = '<input type="hidden" name="page" value="' + document.location.href + '" />\n';
+        var cancel = '<button onclick="location.reload(true);" type="button">Cancel</button>\n';
+        var submit = '<input onclick="save();" type="submit" name="submit" value="Submit" />';
+
+	var inner_form = textarea + div_id + page_url + cancel + submit;
+
+	form.update(inner_form);
+	$(id).insert({after: form});
+        
         //add wysiHat stuff
         Object.extend(editor, WysiHat.Commands);
         var toolbar = new WysiHat.Toolbar(editor);
