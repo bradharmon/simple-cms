@@ -111,6 +111,14 @@ function make_new_dir($new_dir)
 }
 
 #==================================================================
+#php_page_header
+#==================================================================
+function php_page_header()
+{
+   return "<?php\ninclude(\"php/sqlStrings.php\");\ninclude(\"php/getRegionFromDB.php\");\n?>\n";
+}
+
+#==================================================================
 #MAIN
 #==================================================================
 #parse through all files and subdirectories in the templates folder
@@ -120,7 +128,7 @@ $inside_editable_region = false;
 #FIXME: this relative directory for the include won't be correct
 #       for websites with a directory structure
 $editable_region = "";
-$php_page = "<?php\ninclude(\"php/sqlStrings.php\");\ninclude(\"php/getRegionFromDB.php\");\n?>\n";
+$php_page = php_page_header();
 
 if (is_dir($dir))
 {
@@ -175,7 +183,7 @@ if (is_dir($dir))
 	    else
 	    {
 	       #clear out after successfully writing file
-               $php_page = "";
+               $php_page = php_page_header();
 	    }
 	 }
 	 #copy non-html file to correct location
