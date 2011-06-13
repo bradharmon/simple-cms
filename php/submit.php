@@ -17,14 +17,23 @@ foreach($_POST as $key => $value)
 $page = mysql_real_escape_string("../templates/index.html");
 $div_id = mysql_real_escape_string($_POST['div_id']);
 $content = mysql_real_escape_string($_POST['content']);
-$query = "INSERT INTO regions (page, div_id, content) VALUES (\"$page\", \"$div_id\", \"$content\")";
-$result = @mysql_query($query);
-if(!$result)
-{
-   echo 'query: '.$query. '<br/>';
-   echo 'mysql error: '. mysql_error();
-}
 
+#check to see if content exists before inserting
+if(mysql_num_rows(mysql_query("SELECT id FROM regions WHERE content = \"$content\"")))
+{
+   $query = "UPDATE regions SET date = NOW() where content = \"$content\"";
+   $result = @mysql_query($query);
+}
+else
+{
+   $query = "INSERT INTO regions (date, page, div_id, content) VALUES (NOW(), \"$page\", \"$div_id\", \"$content\")";
+   $result = @mysql_query($query);
+   if(!$result)
+   {
+      echo 'query: '.$query. '<br/>';
+      echo 'mysql error: '. mysql_error();
+   }
+}
 ?>	
 </body>
 </html>
