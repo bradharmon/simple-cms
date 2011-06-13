@@ -22,7 +22,7 @@ function add_region_to_db($page, $region)
    $id = mysql_real_escape_string($id);
    $region = mysql_real_escape_string(trim($div->innertext));
 
-   $query = "INSERT INTO regions (page, div_id, content) VALUES (\"$page\", \"$id\", \"$region\")";
+   $query = "INSERT INTO regions (date, page, div_id, content) VALUES (NOW(), \"$page\", \"$id\", \"$region\")";
    $result = @mysql_query($query);
    if(!result)
    {
