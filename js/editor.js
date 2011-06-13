@@ -2,8 +2,8 @@ var editor;
 var editor_visible = false;
 
 function save(){
-  //the editor always copies the data to a <textarea> with id=content before submitting
-  $('content').setValue(WysiHat.Formatting.getApplicationMarkupFrom(editor));
+  //the editor always copies the data to a <textarea> with id=wysihat_textarea before submitting
+  $('wysihat_textarea').setValue(WysiHat.Formatting.getApplicationMarkupFrom(editor));
   //submit
   document.submit_content.submit();
 }
@@ -27,9 +27,9 @@ document.observe("dom:loaded", function() {
         editor = $(id);
         editor.contentEditable = true;
 
-        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'editor_content', 'action':'php/submit.php', 'method':'post'});
+        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'wysihat_form', 'action':'php/submit.php', 'method':'post'});
 
-        var textarea = '<textarea id="content" name="content" style="display:none;"></textarea>\n';
+        var textarea = '<textarea id="wysihat_textarea" name="content" style="display:none;"></textarea>\n';
         var div_id = '<input type="hidden" name="div_id" value="' + id.identify() + '" />\n';
 	var page_url = '<input type="hidden" name="page" value="' + document.location.href + '" />\n';
         var cancel = '<button onclick="location.reload(true);" type="button">Cancel</button>\n';
