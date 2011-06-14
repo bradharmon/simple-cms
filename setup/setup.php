@@ -192,7 +192,7 @@ if (is_dir($dir))
             $new_dir = preg_replace('/^..\/templates\//','../', $file);
 	    $new_dir = dirname($new_dir);
             $new_file = preg_replace('/^..\/templates\//','../', $file);
-            $new_file = preg_replace('/html$/', 'php', $file);
+            $new_file = preg_replace('/html$/', 'php', $new_file);
             make_new_dir($new_dir);
 
             #echo "copy file: $file to $new_file\n";
