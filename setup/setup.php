@@ -102,8 +102,8 @@ function make_new_dir($new_dir)
 {
    if(!is_dir($new_dir))
    {
-      #make dir with permissions of 0744 and allow nested directory creation
-      if(!mkdir($new_dir, 0744, true))
+      #make dir with permissions of 0755 and allow nested directory creation
+      if(!mkdir($new_dir, 0755, true))
       {
          echo "could not create directory: $new_dir\n";
       }
