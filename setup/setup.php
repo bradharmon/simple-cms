@@ -9,11 +9,17 @@ include("../php/thirdparty/simple_html_dom.php");
 #==================================================================
 function add_region_to_db($page, $region)
 {
-   global $websiteBaseUrl;
+   global $websiteBaseUrl, $anon_num;
    #get the id of the editable region using the simple_html_dom api
    $dom = str_get_html($region);
    $div = $dom->find('div', 0);
    $id = $div->id;
+   #assign a unique id to the div if it doesn't have one
+   if($id == "")
+   {
+      $id = "anonymous_element_$anon_num";
+      $div->id = $id;
+   }
 
    #add page, div id, region content to the database
    $rel_page = preg_replace('/^\./', '', $page);  #remove the beginning '.'
@@ -37,7 +43,7 @@ function add_region_to_db($page, $region)
 #==================================================================
 function add_div_to_php($page, $region)
 {
-   global $php_page, $websiteBaseUrl;
+   global $php_page, $websiteBaseUrl, $anon_num;
 
    $rel_page = preg_replace('/^\./', '', $page);  #remove the beginning '.'
    preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $websiteBaseUrl . $rel_page, $rel_page);
@@ -47,6 +53,13 @@ function add_div_to_php($page, $region)
    $dom = str_get_html($region);
    $div = $dom->find('div', 0);
    $id = $div->id;
+   #assign a unique id to the div if it doesn't have one
+   if($id == "")
+   {
+      $id = "anonymous_element_$anon_num";
+      $div->id = $id;
+      $anon_num++;
+   }
 
    $div->innertext = "<?php get_region_from_db(\"$rel_page[1]\", \"$id\") ?>";
 
@@ -157,6 +170,10 @@ function php_page_header()
 #==================================================================
 #MAIN
 #==================================================================
+
+#globals
+$anon_num = 1; #used to generate a unique div id for div's witout one
+
 #parse through all files and subdirectories in the templates folder
 $dir = "../templates/";
 if (!chdir($dir))
