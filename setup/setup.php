@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+include("settings.php");
 include("../php/sqlStrings.php");
 include("../php/thirdparty/simple_html_dom.php");
 
@@ -8,17 +9,17 @@ include("../php/thirdparty/simple_html_dom.php");
 #==================================================================
 function add_region_to_db($page, $region)
 {
+   global $websiteBaseUrl;
    #get the id of the editable region using the simple_html_dom api
    $dom = str_get_html($region);
    $div = $dom->find('div', 0);
    $id = $div->id;
 
-   #echo "*** page: $page, div id: $id ***\n";
-   #echo trim($div->innertext) . "\n";
-   #echo "******\n";
-
    #add page, div id, region content to the database
-   $page = mysql_real_escape_string($page);
+   $rel_page = preg_replace('/^\./', '', $page);  #remove the beginning '.'
+   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $websiteBaseUrl . $rel_page, $rel_page);
+
+   $page = mysql_real_escape_string($rel_page[1]);
    $id = mysql_real_escape_string($id);
    $region = mysql_real_escape_string(trim($div->innertext));
 
@@ -36,7 +37,10 @@ function add_region_to_db($page, $region)
 #==================================================================
 function add_div_to_php($page, $region)
 {
-   global $php_page;
+   global $php_page, $websiteBaseUrl;
+
+   $rel_page = preg_replace('/^\./', '', $page);  #remove the beginning '.'
+   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $websiteBaseUrl . $rel_page, $rel_page);
 
    #replace the inner html of the div with php code
    #that pulls the html from the database
@@ -44,7 +48,7 @@ function add_div_to_php($page, $region)
    $div = $dom->find('div', 0);
    $id = $div->id;
 
-   $div->innertext = "<?php get_region_from_db(\"$page\", \"$id\") ?>";
+   $div->innertext = "<?php get_region_from_db(\"$rel_page[1]\", \"$id\") ?>";
 
    #set div class="editor"
    $div->class = 'editor';
@@ -111,10 +115,42 @@ function make_new_dir($new_dir)
 }
 
 #==================================================================
+#get_absolute_dir
+#==================================================================
+function get_absolute_dir($file)
+{
+   #Make the absolute dir from the website root directory
+   #and the relative dir of the file inside the templates
+   #dir
+   global $websiteBaseDir;
+
+   $rel_dir = preg_replace('/^\./', '', dirname($file));
+
+   return $websiteBaseDir . $rel_dir;
+}
+
+#==================================================================
+#get_absolute_path
+#==================================================================
+function get_absolute_path($file)
+{
+   #Make the absolute path from the website root directory
+   #and the relative path of the file inside the templates
+   #dir
+   global $websiteBaseDir;
+
+   $rel_path = preg_replace('/^\./', '', $file);
+
+   return $websiteBaseDir . $rel_path;
+}
+
+#==================================================================
 #php_page_header
 #==================================================================
 function php_page_header()
 {
+   #FIXME: this relative directory for the include won't be correct
+   #       for websites with a directory structure
    return "<?php\ninclude(\"php/sqlStrings.php\");\ninclude(\"php/getRegionFromDB.php\");\n?>\n";
 }
 
@@ -123,18 +159,19 @@ function php_page_header()
 #==================================================================
 #parse through all files and subdirectories in the templates folder
 $dir = "../templates/";
-
+if (!chdir($dir))
+{
+   echo "could not change directories to the templates directory: $dir\n";
+}
 $inside_editable_region = false;
-#FIXME: this relative directory for the include won't be correct
-#       for websites with a directory structure
 $editable_region = "";
 $php_page = php_page_header();
 
-if (is_dir($dir))
+if (is_dir('.'))
 {
-   if ($dh = opendir($dir))
+   if ($dh = opendir('.'))
    {
-      $dir_tree = dir_to_array($dir);
+      $dir_tree = dir_to_array('.');
       foreach ($dir_tree as $file)
       {
          #echo "filename: $file : filetpye: " . filetype($file) . "<br/>\n";
@@ -153,8 +190,9 @@ if (is_dir($dir))
 	       }
 	       else if ($tr_line == "<!--END EDITABLE REGION-->")
 	       {
-                  add_region_to_db($file, $editable_region);
-		  add_div_to_php($file, $editable_region);
+                  $new_file = preg_replace('/html$/', 'php', $file);
+                  add_region_to_db($new_file, $editable_region);
+		  add_div_to_php($new_file, $editable_region);
 		  $editable_region = "";
 		  $inside_editable_region = false;
 	       }
@@ -170,12 +208,10 @@ if (is_dir($dir))
 	       }
 	    }
 	    #write out new php files
-            $new_dir = preg_replace('/^..\/templates\//','../', $file);
-	    $new_dir = dirname($new_dir);
-            $new_file = preg_replace('/^..\/templates\//','../', $file);
+	    $new_dir = get_absolute_dir($file);
+            $new_file = get_absolute_path($file);
 	    $new_file = preg_replace('/html$/', 'php', $new_file);
             make_new_dir($new_dir);
-	    #echo "write file: $new_file\n";
             if(!file_put_contents($new_file, $php_page))
             {
                echo "could not write file: " . $new_file;
@@ -189,9 +225,8 @@ if (is_dir($dir))
 	 #copy non-html file to correct location
 	 else if (filetype($file) == "file" && !preg_match('/html$/', $file))
 	 {
-            $new_dir = preg_replace('/^..\/templates\//','../', $file);
-	    $new_dir = dirname($new_dir);
-            $new_file = preg_replace('/^..\/templates\//','../', $file);
+            $new_dir = get_absolute_dir($file);
+            $new_file = get_absolute_path($file);
             $new_file = preg_replace('/html$/', 'php', $new_file);
             make_new_dir($new_dir);
 

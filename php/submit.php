@@ -14,14 +14,23 @@ foreach($_POST as $key => $value)
    echo "$key => $value<br/>\n";
 }
 
-$page = mysql_real_escape_string("../templates/index.html");
+#regex that matches everything after the domain name
+preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $_POST['page'], $page);
+echo "regex match: $page[1]";
+$page = mysql_real_escape_string($page[1]);
 $div_id = mysql_real_escape_string($_POST['div_id']);
 $content = mysql_real_escape_string($_POST['content']);
 
-#check to see if content exists before inserting
-if(mysql_num_rows(mysql_query("SELECT id FROM regions WHERE content = \"$content\"")))
+#make sure the page we want to update is already in the database
+if(!mysql_num_rows(mysql_query("SELECT id FROM regions WHERE page = \"$page\"")))
 {
-   $query = "UPDATE regions SET date = NOW() where content = \"$content\"";
+   echo "<br /><br />The page you are trying to update does not exist! Database NOT updated!<br />";
+   echo "page: $page<br />";
+}
+#check to see if content exists before inserting
+else if(mysql_num_rows(mysql_query("SELECT id FROM regions WHERE page = \"$page\" AND content = \"$content\"")))
+{
+   $query = "UPDATE regions SET date = NOW() where page = \"$page\" AND content = \"$content\"";
    $result = @mysql_query($query);
 }
 else
