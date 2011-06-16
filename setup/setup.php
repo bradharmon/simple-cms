@@ -90,15 +90,13 @@ function insert_scripts($dom)
 #==================================================================
 #dir_to_array
 #==================================================================
-function dir_to_array($directory, $recursive = true) {
+function dir_to_array($directory) {
 	$array_items = array();
 	if ($handle = opendir($directory)) {
 		while (false !== ($file = readdir($handle))) {
 			if ($file != "." && $file != "..") {
 				if (is_dir($directory. "/" . $file)) {
-					if($recursive) {
-						$array_items = array_merge($array_items, dir_to_array($directory. "/" . $file, $recursive));
-					}
+					$array_items = array_merge($array_items, dir_to_array($directory. "/" . $file));
 					$file = $directory . "/" . $file;
 					$array_items[] = preg_replace("/\/\//si", "/", $file);
 				} else {
@@ -162,9 +160,12 @@ function get_absolute_path($file)
 #==================================================================
 function php_page_header()
 {
-   #FIXME: this relative directory for the include won't be correct
-   #       for websites with a directory structure
-   return "<?php\ninclude(\"php/sqlStrings.php\");\ninclude(\"php/getRegionFromDB.php\");\n?>\n";
+   global $simpleCmsBaseDir;
+
+   return "<?php
+   include(\"$simpleCmsBaseDir/php/sqlStrings.php\");
+   include(\"$simpleCmsBaseDir/php/getRegionFromDB.php\");
+   ?>";
 }
 
 #==================================================================
