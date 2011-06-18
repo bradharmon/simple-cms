@@ -11,8 +11,8 @@ function add_region_to_db($page, $region)
 {
    global $websiteBaseUrl, $anon_num;
    #get the id of the editable region using the simple_html_dom api
-   $dom = str_get_html($region);
-   $div = $dom->find('div', 0);
+   $html = str_get_html($region);
+   $div = $html->find('div', 0);
    $id = $div->id;
    #assign a unique id to the div if it doesn't have one
    if($id == "")
@@ -50,8 +50,8 @@ function add_div_to_php($page, $region)
 
    #replace the inner html of the div with php code
    #that pulls the html from the database
-   $dom = str_get_html($region);
-   $div = $dom->find('div', 0);
+   $html = str_get_html($region);
+   $div = $html->find('div', 0);
    $id = $div->id;
    #assign a unique id to the div if it doesn't have one
    if($id == "")
@@ -73,9 +73,9 @@ function add_div_to_php($page, $region)
 #==================================================================
 #insert_scripts
 #==================================================================
-function insert_scripts($dom)
+function insert_scripts($html)
 {
-   $head = $dom->find('head', 0);
+   $head = $html->find('head', 0);
    $head_html = $head->innertext;
    $head_html .= "\n";
    $head_html .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/editor.css\" />\n";
@@ -84,9 +84,40 @@ function insert_scripts($dom)
    $head_html .= "<script type=\"text/javascript\" src=\"js/editor.js\"></script>\n";
    $head->innertext = $head_html;
 
-   return explode("\n", $dom);
+   #return explode("\n", $html);
+   return $html;
 }
 
+#==================================================================
+#translate_links
+#==================================================================
+function translate_links($html, $file_list)
+{
+   #given the html and a list of pages on the website, if there is 
+   #a link in the html that points to a page on the website, 
+   #make sure the link ends in .php instead of .html
+
+   #remove './' from beginning of file list
+   $file_list = preg_replace('/^\.\//', '', $file_list);
+
+   $links = $html->find('a');
+   foreach($links as $element)
+   {
+      $link = $element->href;
+      foreach($file_list as $file)
+      {
+         #if any file in the tree matches a link
+	 #change the link's extension to .php
+         if(false !== strpos($link, $file))
+	 {
+            $element->href = preg_replace('/html$/', 'php', $link);
+	    break;
+	 }
+      }
+   }
+
+   return $html;
+}
 #==================================================================
 #dir_to_array
 #==================================================================
@@ -196,11 +227,12 @@ if (is_dir('.'))
 	 if(filetype($file) == "file" && preg_match('/html$/', $file))
 	 {
 	    #add our scripts in the <head>
-            $dom = file_get_html($file);
-	    $html = insert_scripts($dom);
+            $html = file_get_html($file);
+	    $html = insert_scripts($html);
+	    $html = translate_links($html, $dir_tree);
+            $html = explode("\n", $html);
 	    foreach($html as $line)
 	    {
-               #echo "$line";
                $tr_line = trim($line);
 	       if ($tr_line == "<!--START EDITABLE REGION-->")
 	       {
