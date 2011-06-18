@@ -1,20 +1,13 @@
-This is eventually going to be a simple cms that uses HTML templates 
-and some setup scripts to automatically generate the proper mysql tables 
-and php code to display and edit a website.
+This is a CMS that aims to make it easy to set up content management for relatively simple websites created in HTML
 
-TODO:
-1. fix boogs!!
-
-Already completed:
-1. integrate WysiHat into a page so that any div with class="editor" can be edited
-   and sent to the server to be processed (example - editor.php)
-2. create server side code that saves POSTed div contents to the database
-   (crudely done at this point - proof of concept)
-3. create server side code that reads an HTML template that automatically generates mysql tables
-4. create server side code that auto-generate php files that allow viewing and editing of the site
-
-Goals:
-1. Add features:
-   -cms editor history
-   -edit in html mode
-   -log in to edit
+Here is how it works:
+1. Create your html website
+2. Add comment tags around div's you want a user to be able to edit
+   <!--START EDITABLE REGION-->
+   <div>editable content</div>
+   <!--END EDITABLE REGION-->
+3. Place entire website (HTML, images, js, etc) in the templates directory
+4. Add proper info to php/sqlStrings.php and setup/settings.php
+5. Go to setup/setup.php in your web browser
+6. All divs marked as editable will now be in a mysql database and php will be generated which allows the content to be viewed and edited
+7. Generated php will be located in the website root as specified in setup/settings.php
