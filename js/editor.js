@@ -30,7 +30,7 @@ document.observe("dom:loaded", function() {
         var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'wysihat_form', 'action':'php/submit.php', 'method':'post'});
 
         var textarea = '<textarea id="wysihat_textarea" name="content" style="display:none;"></textarea>\n';
-        var div_id = '<input type="hidden" name="div_id" value="' + id.identify() + '" />\n';
+        var div_id = '<input type="hidden" name="div_id" value="' + id.up().identify() + '" />\n';
 	var page_url = '<input type="hidden" name="page" value="' + document.location.href + '" />\n';
         var cancel = '<button onclick="location.reload(true);" type="button">Cancel</button>\n';
         var submit = '<input onclick="save();" type="submit" name="submit" value="Submit" />';
@@ -39,6 +39,10 @@ document.observe("dom:loaded", function() {
 
 	form.update(inner_form);
 	$(id).insert({after: form});
+
+	//if(id.up().getStyle('overflow') == 'hidden'){
+	//   id.up().setStyle({overflow: scroll});
+        //}
         
         //add wysiHat stuff
         Object.extend(editor, WysiHat.Commands);

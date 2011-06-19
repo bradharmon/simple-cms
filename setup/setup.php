@@ -1,8 +1,8 @@
 #!/usr/bin/php
 <?php
-include("settings.php");
-include("../php/sqlStrings.php");
-include("../php/thirdparty/simple_html_dom.php");
+include_once("settings.php");
+include_once("../php/sqlStrings.php");
+include_once("../php/thirdparty/simple_html_dom.php");
 
 #==================================================================
 #add_region_to_db
@@ -64,7 +64,7 @@ function add_div_to_php($page, $region)
    $div->innertext = "<?php get_region_from_db(\"$rel_page[1]\", \"$id\") ?>";
 
    #set div class="editor"
-   $div->class = 'editor';
+   #$div->class = 'editor';
 
    #add to php_page
    $php_page .= $div;
