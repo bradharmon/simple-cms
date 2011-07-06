@@ -224,7 +224,6 @@ if (is_dir('.'))
       $css_tree = dir_to_array('../css');
       $js_tree = dir_to_array('../js');
       $dir_tree = array_merge($dir_tree, $css_tree, $js_tree);
-      var_dump($dir_tree);
       foreach ($dir_tree as $file)
       {
 	 //if this is a file with a .html extension
