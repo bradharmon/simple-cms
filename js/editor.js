@@ -27,7 +27,7 @@ document.observe("dom:loaded", function() {
         editor = $(id);
         editor.contentEditable = true;
 
-        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'wysihat_form', 'action':'php/submit.php', 'method':'post'});
+        var form = new Element('form', {'enctype':'multipart/form-data', 'name':'submit_content', 'id':'wysihat_form', 'action':'simple-cms/php/submit.php', 'method':'post'});
 
         var textarea = '<textarea id="wysihat_textarea" name="content" style="display:none;"></textarea>\n';
         var div_id = '<input type="hidden" name="div_id" value="' + id.up().identify() + '" />\n';

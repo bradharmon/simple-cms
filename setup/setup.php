@@ -1,15 +1,14 @@
 #!/usr/bin/php
 <?php
-include_once("settings.php");
-include_once("../php/sqlStrings.php");
-include_once("../php/thirdparty/simple_html_dom.php");
+include_once('../settings.php');
+include_once(CMS_DIR . '/php/thirdparty/simple_html_dom.php');
 
 #==================================================================
 #add_region_to_db
 #==================================================================
 function add_region_to_db($page, $region)
 {
-   global $websiteBaseUrl, $anon_num;
+   global $anon_num, $dbh;
    #get the id of the editable region using the simple_html_dom api
    $html = str_get_html($region);
    $div = $html->find('div', 0);
@@ -23,18 +22,18 @@ function add_region_to_db($page, $region)
 
    #add page, div id, region content to the database
    $rel_page = preg_replace('/^\./', '', $page);  #remove the beginning '.'
-   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $websiteBaseUrl . $rel_page, $rel_page);
+   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', WEBSITE_URL . $rel_page, $rel_page);
 
-   $page = mysql_real_escape_string($rel_page[1]);
-   $id = mysql_real_escape_string($id);
-   $region = mysql_real_escape_string(trim($div->innertext));
-
-   $query = "INSERT INTO regions (date, page, div_id, content) VALUES (NOW(), \"$page\", \"$id\", \"$region\")";
-   $result = @mysql_query($query);
-   if(!result)
-   {
-      echo "query: $query\n";
-      echo "mysql error:" . mysql_error();
+   $page = $rel_page[1];
+   $region = trim($div->innertext);
+   try {
+      $sth = $dbh->prepare("INSERT INTO regions (date, page, div_id, content) VALUES (NOW(), ?, ?, ?)");
+      $sth->execute(array($page, $id, $region));
+   } catch (PDOException $e) {
+      echo __FILE__ . ": " . __LINE__ . "<br>\n";
+      echo "page: '$page', id: '$id';, region: '$region'<br>\n";
+      die();
+      #echo $e->getMessage();
    }
 }
 
@@ -43,10 +42,10 @@ function add_region_to_db($page, $region)
 #==================================================================
 function add_div_to_php($page, $region)
 {
-   global $php_page, $websiteBaseUrl, $anon_num;
+   global $php_page, $anon_num;
 
    $rel_page = preg_replace('/^\./', '', $page);  #remove the beginning '.'
-   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $websiteBaseUrl . $rel_page, $rel_page);
+   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', WEBSITE_URL . $rel_page, $rel_page);
 
    #replace the inner html of the div with php code
    #that pulls the html from the database
@@ -161,14 +160,14 @@ function make_new_dir($new_dir)
 #==================================================================
 function get_absolute_dir($file)
 {
+   #take off leading '..' or '.'
+   $rel_dir = preg_replace('/^\.\./', '', dirname($file));
+   $rel_dir = preg_replace('/^\./', '', $rel_dir);
+
    #Make the absolute dir from the website root directory
    #and the relative dir of the file inside the templates
    #dir
-   global $websiteBaseDir;
-
-   $rel_dir = preg_replace('/^\./', '', dirname($file));
-
-   return $websiteBaseDir . $rel_dir;
+   return WEBSITE_DIR . $rel_dir;
 }
 
 #==================================================================
@@ -176,14 +175,14 @@ function get_absolute_dir($file)
 #==================================================================
 function get_absolute_path($file)
 {
+   #take off leading '..' or '.'
+   $rel_path = preg_replace('/^\.\./', '', $file);
+   $rel_path = preg_replace('/^\./', '', $rel_path);
+
    #Make the absolute path from the website root directory
    #and the relative path of the file inside the templates
    #dir
-   global $websiteBaseDir;
-
-   $rel_path = preg_replace('/^\./', '', $file);
-
-   return $websiteBaseDir . $rel_path;
+   return WEBSITE_DIR . $rel_path;
 }
 
 #==================================================================
@@ -191,12 +190,12 @@ function get_absolute_path($file)
 #==================================================================
 function php_page_header()
 {
-   global $simpleCmsBaseDir;
-
    return "<?php
-   include(\"$simpleCmsBaseDir/php/sqlStrings.php\");
-   include(\"$simpleCmsBaseDir/php/getRegionFromDB.php\");
-   ?>";
+   session_start();
+
+   include(\"". CMS_DIR ."/settings.php\");
+   include(\"". CMS_DIR ."/php/getRegionFromDB.php\");
+?>";
 }
 
 #==================================================================
@@ -221,9 +220,14 @@ if (is_dir('.'))
    if ($dh = opendir('.'))
    {
       $dir_tree = dir_to_array('.');
+      //get css and js directories as well
+      $css_tree = dir_to_array('../css');
+      $js_tree = dir_to_array('../js');
+      $dir_tree = array_merge($dir_tree, $css_tree, $js_tree);
+      var_dump($dir_tree);
       foreach ($dir_tree as $file)
       {
-         #echo "filename: $file : filetpye: " . filetype($file) . "<br/>\n";
+	 //if this is a file with a .html extension
 	 if(filetype($file) == "file" && preg_match('/html$/', $file))
 	 {
 	    #add our scripts in the <head>
@@ -277,13 +281,12 @@ if (is_dir('.'))
 	 {
             $new_dir = get_absolute_dir($file);
             $new_file = get_absolute_path($file);
-            $new_file = preg_replace('/html$/', 'php', $new_file);
             make_new_dir($new_dir);
 
-            #echo "copy file: $file to $new_file\n";
+            #echo "copy file: $file to $new_file<br>\n";
             if(!copy($file, $new_file))
 	    {
-               echo "could not copy file: '$file' to new destination: $new_file\n";
+               echo "could not copy file: '$file' to new destination: $new_file<br>\n";
 	    }
 	 }
       }

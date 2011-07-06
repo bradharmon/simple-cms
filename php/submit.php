@@ -1,41 +1,51 @@
 <?php
-include("sqlStrings.php");
+session_start();
 
-#foreach($_POST as $key => $value)
-#{
-#   echo "$key => $value<br/>\n";
-#}
+include('../settings.php');
+include(CMS_DIR . '/login/session.php');
 
-#regex that matches everything after the domain name
-preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $_POST['page'], $page);
-#echo "regex match: $page[1]";
-$page = mysql_real_escape_string($page[1]);
-$div_id = mysql_real_escape_string($_POST['div_id']);
-$content = mysql_real_escape_string($_POST['content']);
+if(isLoggedIn())
+{
+   #regex that matches everything after the domain name
+   preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $_POST['page'], $page);
 
-#make sure the page we want to update is already in the database
-if(!mysql_num_rows(mysql_query("SELECT id FROM regions WHERE page = \"$page\"")))
-{
-   #echo "<br /><br />The page you are trying to update does not exist! Database NOT updated!<br />";
-   #echo "page: $page<br />";
-}
-#check to see if content exists before inserting
-else if(mysql_num_rows(mysql_query("SELECT id FROM regions WHERE page = \"$page\" AND content = \"$content\"")))
-{
-   $query = "UPDATE regions SET date = NOW() where page = \"$page\" AND content = \"$content\"";
-   $result = @mysql_query($query);
-}
-else
-{
-   $query = "INSERT INTO regions (date, page, div_id, content) VALUES (NOW(), \"$page\", \"$div_id\", \"$content\")";
-   $result = @mysql_query($query);
-   if(!$result)
-   {
-      #echo 'query: '.$query. '<br/>';
-      #echo 'mysql error: '. mysql_error();
+   $page = $page[1];
+   $div_id = $_POST['div_id'];
+   $content = $_POST['content'];
+
+   try {
+      #check to make sure the page/region are in the db
+      $sth = $dbh->prepare("SELECT id FROM regions WHERE page = ?");
+      $sth->execute(array($page));
+      if($sth->rowCount())
+      {
+         #check to see if same content exists before inserting
+	 $sth = $dbh->prepare("SELECT id FROM regions WHERE page = ? AND content = ?");
+	 $sth->execute(array($page, $content));
+	 if($sth->rowCount())
+         {
+            #if content already exists, moving the date to current forces the
+            #older content to be displayed
+            $sth = $dbh->prepare("UPDATE regions SET date = NOW() where page = ? AND content = ?");
+            $sth->execute(array($page, $content));
+         }
+         else
+         {
+   	 $sth = $dbh->prepare("INSERT INTO regions (date, page, div_id, content) VALUES(NOW(), ?, ?, ?)");
+   	 $sth->execute(array($page, $div_id, $content));
+         }
+      }
+      else
+      {
+         #page/region isn't in db - probably someone messing with the system
+         #silently ignore for now
+      }
+   } catch(PDOException $e) {
+      echo $e->getMessage();
    }
 }
-
-#redirect to the page that was just submitted
-header("Location: " . $_POST['page']);
+   
+#don't redirect to $_POST['page'], as this is a security risk
+#where a link could be constructed that forwards to any page
+header("Location: ". ROOT_URL . "/$page");
 ?>	
