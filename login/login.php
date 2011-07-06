@@ -99,6 +99,7 @@ print_session_vars();
 </form>
 
 <?php
+echo "<a href=\"". CMS_URL ."/register.php\">Register</a> ";
 echo "<a href=\"". CMS_URL ."/reset_password.php\">Forgot Password?</a>";
 ?>
 
