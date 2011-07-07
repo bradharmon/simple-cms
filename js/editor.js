@@ -3,7 +3,8 @@ var editor_visible = false;
 
 function save(){
   //the editor always copies the data to a <textarea> with id=wysihat_textarea before submitting
-  $('wysihat_textarea').setValue(WysiHat.Formatting.getApplicationMarkupFrom(editor));
+  //$('wysihat_textarea').setValue(WysiHat.Formatting.getApplicationMarkupFrom(editor));
+  $('wysihat_textarea').setValue($$('.editor')[0].innerHTML);
   //submit
   document.submit_content.submit();
 }
@@ -52,6 +53,18 @@ document.observe("dom:loaded", function() {
         toolbar.addButton({
           label: "Link",
           handler: function(editor) { return editor.promptLinkSelection(); }
+        });
+        toolbar.addButton({
+          label: "Left",
+          handler: function(editor) { return editor.alignSelection('left') }
+        });
+        toolbar.addButton({
+          label: "Right",
+          handler: function(editor) { return editor.alignSelection('right') }
+        });
+        toolbar.addButton({
+          label: "Center",
+          handler: function(editor) { return editor.alignSelection('center') }
         });
 
         /*
