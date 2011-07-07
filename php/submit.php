@@ -8,8 +8,14 @@ if(isLoggedIn())
 {
    #regex that matches everything after the domain name
    preg_match('/\w*:\/\/w*\.?[\w-_]*\.?[A-Za-z]*:?\d*\/(.*)/', $_POST['page'], $page);
-
    $page = $page[1];
+   
+   #append index.php as default if a php file isn't specified
+   if(!preg_match('/\.php$/', $page))
+   {
+      $page .= 'index.php';
+   }
+
    $div_id = $_POST['div_id'];
    $content = $_POST['content'];
 
@@ -39,6 +45,9 @@ if(isLoggedIn())
       {
          #page/region isn't in db - probably someone messing with the system
          #silently ignore for now
+	 #echo "page: '$page'<br>\n";
+	 #echo "div_id: '$div_id'<br>\n";
+	 #echo "content: '$content'<br>\n";
       }
    } catch(PDOException $e) {
       echo $e->getMessage();
