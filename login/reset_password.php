@@ -110,29 +110,79 @@ else if(isset($_GET['email']) && isset($_GET['code']))
 {
    session_start();
 
-   print_session_vars();
-
    $email = $_GET['email'];
    $verification_hash = $_GET['code'];
 
    //display password reset form
-   $form = "<form name=\"reset\" action=\"reset_password.php\" method=\"post\">\n" .
-           "   Email: $email<br>\n" .
-	   "   <input type=\"hidden\" name=\"email\" value=\"$email\" />\n" .
-	   "   <input type=\"hidden\" name=\"code\" value=\"$verification_hash\" />\n" .
-           "   Password: <input type=\"text\" name=\"pass1\" />\n" .
-           "   Password Again: <input type=\"text\" name=\"pass2\" />\n" .
-           "   <input type=\"submit\" value=\"Submit\" />\n" .
-           "</form>\n";
-   echo $form;
+//   $form = "<form name=\"reset\" action=\"reset_password.php\" method=\"post\">\n" .
+//           "   Email: $email<br>\n" .
+//	   "   <input type=\"hidden\" name=\"email\" value=\"$email\" />\n" .
+//	   "   <input type=\"hidden\" name=\"code\" value=\"$verification_hash\" />\n" .
+//           "   Password: <input type=\"text\" name=\"pass1\" />\n" .
+//           "   Password Again: <input type=\"text\" name=\"pass2\" />\n" .
+//           "   <input type=\"submit\" value=\"Submit\" />\n" .
+//           "</form>\n";
+
+   $html = '<html>' .
+           '<head>' .
+           '<link rel="stylesheet" href="login.css" type="text/css"/>' .
+           '</head>' .
+           '<body>' .
+           '<div id="login-wrapper">' .
+           print_session_vars() .
+           '<div id="login">' .
+           '<form name="reset" action="reset_password.php" method="post">' .
+           '    <div class="clear">' .
+           '       <label for="email">Email:</label>' .
+           '       <input type="email" name="email" value="' . $email . '" disabled/>' .
+           '    </div>' .
+           '    <div class="clear">' .
+           '       <label for="password">Password:</label>' .
+           '       <input type="password" name="pass1" />' .
+           '    </div>' .
+           '    <div class="clear">' .
+           '       <label for="password">Password:</label>' .
+           '       <input type="password" name="pass2" />' .
+           '    </div>' .
+           '    <div class="clear">' .
+	   '       <input type="hidden" name="code" value="' . $verification_hash . '"' .
+           '       <input class="submit" type="submit" value="Reset" />' .
+           '    </div>' .
+           '</form>' .
+           '</div>' .
+           '</div>' .
+           '<body>' .
+           '</html>';
+
+   echo $html;
    die();
 }
 //if no post or get vars, print the form
+push_status("Enter your email address that you signed up with.");
+push_status("An email will be sent to this address with further instructions.");
 ?>
-Enter your email address that you signed up with and an email will be sent<br>
-to you with a link to a page that will allow you to reset your password.<br>
-<form name="reset" action="reset_password.php" method="post">
-    Email: <input type="text" name="email" />
-    <input type="submit" value="Reset" />
-</form>
+<html>
+<head>
+<link rel="stylesheet" href="login.css" type="text/css"/>
+</head>
 
+<body>
+
+<div id="login-wrapper">
+<?php print_session_vars() ?>
+<div id="login">
+<form name="reset" action="reset_password.php" method="post">
+    <div class="clear">
+       <label for="email">Email:</label>
+       <input type="text" name="email"/>
+    </div>
+
+    <div class="clear">
+       <input class="submit" type="submit" value="Reset" />
+    </div>
+</form>
+</div>
+</div>
+
+<body>
+</html>

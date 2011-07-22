@@ -10,7 +10,7 @@ $password = $_POST['password'];
 $resend = $_GET['resend'];
 $resend_email = $_GET['email'];
 
-//login
+//login with provided credentials
 if(isset($_POST['email']) && isset($_POST['password']))
 {
    //verify password
@@ -50,9 +50,8 @@ if(isset($_POST['email']) && isset($_POST['password']))
    if($verified === '0')
    {
       $link = "<a href=\"". CMS_URL ."/login.php?email=$email&resend=true\">here</a>";
-      $msg = "Your registration has not yet been verified. Please check your email and click the verification link<br>";
-      $msg .= "Click $link to resend link<br>";
-      push_error($msg);
+      push_error("Your registration has not yet been verified. Please check your email and click the verification link.<br>");
+      push_error("Click $link to resend link<br>");
    }
    die_on_error("login.php");
    
@@ -89,17 +88,36 @@ else if($resend === 'true' && $resend_email !== '')
 
 //if we aren't checking login credentials, or resending verification link
 //display the login form
-print_session_vars();
+//print_session_vars();
 ?>
 
+<html>
+<head>
+<link rel="stylesheet" href="login.css" type="text/css"/>
+</head>
+
+<body>
+
+<div id="login-wrapper">
+<?php print_session_vars() ?>
+<div id="login">
 <form name="login" action="login.php" method="post">
-    Email: <input type="text" name="email" />
-    Password: <input type="password" name="password" />
-    <input type="submit" value="Login" />
+    <div class="clear">
+       <label for="email">Email:</label>
+       <input type="text" name="email" />
+    </div>
+
+    <div class="clear">
+       <label for="password">Password:</label>
+       <input type="password" name="password" />
+    </div>
+    <div class="clear">
+       <input class="submit" type="submit" value="Login" />
+       <span><strong>or</strong> <a href="<?php echo CMS_URL . '/reset_password.php' ?>">Reset your password</a></span>
+    </div>
 </form>
+</div>
+</div>
 
-<?php
-echo "<a href=\"". CMS_URL ."/register.php\">Register</a> ";
-echo "<a href=\"". CMS_URL ."/reset_password.php\">Forgot Password?</a>";
-?>
-
+<body>
+</html>

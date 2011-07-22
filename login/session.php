@@ -48,22 +48,24 @@ function die_on_error($forward_page)
 }
 function print_session_vars()
 {
-if(isset($_SESSION['errors']) && is_array($_SESSION['errors']))
-{
-   echo "errors:<br>";
-   foreach($_SESSION['errors'] as $error)
+   if(isset($_SESSION['errors']) && is_array($_SESSION['errors']))
    {
-      echo "$error<br>";
+      echo '<div id="errors">';
+      foreach($_SESSION['errors'] as $error)
+      {
+         echo '<p class="alert">' . $error . '</p>';
+      }
+      echo '</div>';
    }
-}
-if(isset($_SESSION['statuses']) && is_array($_SESSION['statuses']))
-{
-   echo "status:<br>";
-   foreach($_SESSION['statuses'] as $status)
+   if(isset($_SESSION['statuses']) && is_array($_SESSION['statuses']))
    {
-      echo "$status<br>";
+      echo '<div id="status">';
+      foreach($_SESSION['statuses'] as $status)
+      {
+         echo '<p class="alert">' . $status . '</p>';
+      }
+      echo '</div>';
    }
-}
-cleanup_session();
+   cleanup_session();
 }
 ?>
