@@ -93,7 +93,7 @@ else if($resend === 'true' && $resend_email !== '')
 
 <html>
 <head>
-<link rel="stylesheet" href="login.css" type="text/css"/>
+<link rel="stylesheet" href="../css/box.css" type="text/css"/>
 </head>
 
 <body>

@@ -125,7 +125,7 @@ else if(isset($_GET['email']) && isset($_GET['code']))
 
    $html = '<html>' .
            '<head>' .
-           '<link rel="stylesheet" href="login.css" type="text/css"/>' .
+           '<link rel="stylesheet" href="../css/box.css" type="text/css"/>' .
            '</head>' .
            '<body>' .
            '<div id="login-wrapper">' .
@@ -163,7 +163,7 @@ push_status("An email will be sent to this address with further instructions.");
 ?>
 <html>
 <head>
-<link rel="stylesheet" href="login.css" type="text/css"/>
+<link rel="stylesheet" href="../css/box.css" type="text/css"/>
 </head>
 
 <body>
