@@ -17,7 +17,7 @@ $err = false;
 $errors = array();
 $statuses = array();
 
-//collect registration information
+//collect registration information and register new user
 if(isset($_POST['email']) && isset($_POST['pass1']) && isset($_POST['pass2']))
 {
    try {
