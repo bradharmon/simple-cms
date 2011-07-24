@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 include_once('../settings.php');
 include_once(CMS_DIR . '/php/thirdparty/simple_html_dom.php');
@@ -30,11 +29,14 @@ function add_region_to_db($page, $region)
       $sth = $dbh->prepare("INSERT INTO regions (date, page, div_id, content) VALUES (NOW(), ?, ?, ?)");
       $sth->execute(array($page, $id, $region));
    } catch (PDOException $e) {
-      echo __FILE__ . ": " . __LINE__ . "<br>\n";
-      echo "page: '$page', id: '$id';, region: '$region'<br>\n";
+      $msg = __FILE__ . ": " . __LINE__ . "<br>\n";
+      $msg .="page: '$page', id: '$id', region: '$region'<br>\n";
+      $msg .= $e->getMessage();
+      push_status('failed', $msg);
+      print_status();
       die();
-      #echo $e->getMessage();
    }
+   push_status('passed', "Added $page: $id into regions db<br>\n");
 }
 
 #==================================================================
@@ -106,12 +108,12 @@ function translate_links($html, $file_list)
       foreach($file_list as $file)
       {
          #if any file in the tree matches a link
-	 #change the link's extension to .php
+    #change the link's extension to .php
          if(false !== strpos($link, $file))
-	 {
+    {
             $element->href = preg_replace('/html$/', 'php', $link);
-	    break;
-	 }
+       break;
+    }
       }
    }
 
@@ -121,23 +123,23 @@ function translate_links($html, $file_list)
 #dir_to_array
 #==================================================================
 function dir_to_array($directory) {
-	$array_items = array();
-	if ($handle = opendir($directory)) {
-		while (false !== ($file = readdir($handle))) {
-			if ($file != "." && $file != "..") {
-				if (is_dir($directory. "/" . $file)) {
-					$array_items = array_merge($array_items, dir_to_array($directory. "/" . $file));
-					$file = $directory . "/" . $file;
-					$array_items[] = preg_replace("/\/\//si", "/", $file);
-				} else {
-					$file = $directory . "/" . $file;
-					$array_items[] = preg_replace("/\/\//si", "/", $file);
-				}
-			}
-		}
-		closedir($handle);
-	}
-	return $array_items;
+   $array_items = array();
+   if ($handle = opendir($directory)) {
+      while (false !== ($file = readdir($handle))) {
+         if ($file != "." && $file != "..") {
+            if (is_dir($directory. "/" . $file)) {
+               $array_items = array_merge($array_items, dir_to_array($directory. "/" . $file));
+               $file = $directory . "/" . $file;
+               $array_items[] = preg_replace("/\/\//si", "/", $file);
+            } else {
+               $file = $directory . "/" . $file;
+               $array_items[] = preg_replace("/\/\//si", "/", $file);
+            }
+         }
+      }
+      closedir($handle);
+   }
+   return $array_items;
 }
 
 #==================================================================
@@ -150,7 +152,11 @@ function make_new_dir($new_dir)
       #make dir with permissions of 0755 and allow nested directory creation
       if(!mkdir($new_dir, 0755, true))
       {
-         echo "could not create directory: $new_dir\n";
+         push_status('failed', "could not create directory: $new_dir<br>\n");
+      }
+      else
+      {
+         push_status('passed', "created directory: $new_dir<br>\n");
       }
    }
 }
@@ -199,98 +205,220 @@ function php_page_header()
 }
 
 #==================================================================
+#push_status
+#==================================================================
+function push_status($status,$message)
+{
+   global $statuses, $count;
+
+   $statuses[$count][$status] = $message;
+   
+   $count++;
+}
+
+#==================================================================
+#print_status
+#==================================================================
+function print_status()
+{
+   global $statuses;
+
+   $html = '<html>' .
+   '<head>' .
+   '<link rel="stylesheet" href="../css/box.css" type="text/css"/>' .
+   '<style>' .
+   'label {' .
+   'width: 210px;' .
+   '}' .
+   'input {' .
+   'width: 200px;' .
+   '}' .
+   '</style>' .
+   '</head>' .
+   '<body>' .
+   '<div id="login-wrapper">' .
+   '<div id="login">';
+
+   foreach($statuses as $tuple)
+   {
+      
+      foreach($tuple as $status=>$message)
+      {
+         $html .= "$status   $message<br>\n";
+      }
+   }
+
+   $html .= '</div>' .
+   '</div>' .
+   '<body>' .
+   '</html>';
+
+   echo $html;
+}
+
+#==================================================================
 #MAIN
 #==================================================================
+$db_user =     $_POST['db_user'];
+$db_password = $_POST['db_password'];
+$db_host =     $_POST['db_host'];
+$db_name =     $_POST['db_name'];
 
-#globals
-$anon_num = 1; #used to generate a unique div id for div's witout one
-
-#parse through all files and subdirectories in the templates folder
-$dir = "../templates/";
-if (!chdir($dir))
+#start the setup process if we have the db values we need to proceed
+if(isset($_POST['db_user']) && isset($_POST['db_password']) && isset($_POST['db_host']) && isset($_POST['db_name']))
 {
-   echo "could not change directories to the templates directory: $dir\n";
-}
-$inside_editable_region = false;
-$editable_region = "";
-$php_page = php_page_header();
+   #FIXME: write db POST values to top of settings.php
 
-if (is_dir('.'))
-{
-   if ($dh = opendir('.'))
+   #global vars
+   $anon_num = 1; #used to generate a unique div id for div's witout one
+   $statuses = array();
+   $count = 0;
+   
+   #parse through all files and subdirectories in the templates folder
+   $dir = "../templates/";
+   if (!chdir($dir))
    {
-      $dir_tree = dir_to_array('.');
-      //get css and js directories as well
-      $css_tree = dir_to_array('../css');
-      $js_tree = dir_to_array('../js');
-      $dir_tree = array_merge($dir_tree, $css_tree, $js_tree);
-      foreach ($dir_tree as $file)
-      {
-	 //if this is a file with a .html extension
-	 if(filetype($file) == "file" && preg_match('/html$/', $file))
-	 {
-	    #add our scripts in the <head>
-            $html = file_get_html($file);
-	    $html = insert_scripts($html);
-	    $html = translate_links($html, $dir_tree);
-            $html = explode("\n", $html);
-	    foreach($html as $line)
-	    {
-               $tr_line = trim($line);
-	       if ($tr_line == "<!--START EDITABLE REGION-->")
-	       {
-                  $inside_editable_region = true;
-	       }
-	       else if ($tr_line == "<!--END EDITABLE REGION-->")
-	       {
-                  $new_file = preg_replace('/html$/', 'php', $file);
-                  add_region_to_db($new_file, $editable_region);
-		  add_div_to_php($new_file, $editable_region);
-		  $editable_region = "";
-		  $inside_editable_region = false;
-	       }
-	       else if ($inside_editable_region)
-	       {
-                  $editable_region .= $line . "\n";
-	       }
-	       else
-	       {
-	          #add each line from html to the new php page
-		  #except the editable regions
-	          $php_page .= $line . "\n";
-	       }
-	    }
-	    #write out new php files
-	    $new_dir = get_absolute_dir($file);
-            $new_file = get_absolute_path($file);
-	    $new_file = preg_replace('/html$/', 'php', $new_file);
-            make_new_dir($new_dir);
-            if(!file_put_contents($new_file, $php_page))
-            {
-               echo "could not write file: " . $new_file;
-            }
-	    else
-	    {
-	       #clear out after successfully writing file
-               $php_page = php_page_header();
-	    }
-	 }
-	 #copy non-html file to correct location
-	 else if (filetype($file) == "file" && !preg_match('/html$/', $file))
-	 {
-            $new_dir = get_absolute_dir($file);
-            $new_file = get_absolute_path($file);
-            make_new_dir($new_dir);
-
-            #echo "copy file: $file to $new_file<br>\n";
-            if(!copy($file, $new_file))
-	    {
-               echo "could not copy file: '$file' to new destination: $new_file<br>\n";
-	    }
-	 }
-      }
-      closedir($dh);
+      push_status('failed', "could not change directories to the templates directory: $dir\n");
    }
+   $inside_editable_region = false;
+   $editable_region = "";
+   $php_page = php_page_header();
+   
+   if (is_dir('.'))
+   {
+      if ($dh = opendir('.'))
+      {
+         $dir_tree = dir_to_array('.');
+         //get css and js directories as well
+         $css_tree = dir_to_array('../css');
+         $js_tree = dir_to_array('../js');
+         $dir_tree = array_merge($dir_tree, $css_tree, $js_tree);
+         foreach ($dir_tree as $file)
+         {
+            //if this is a file with a .html extension
+            if(filetype($file) == "file" && preg_match('/html$/', $file))
+            {
+               #add our scripts in the <head>
+               $html = file_get_html($file);
+               $html = insert_scripts($html);
+               $html = translate_links($html, $dir_tree);
+               $html = explode("\n", $html);
+               foreach($html as $line)
+               {
+                  $tr_line = trim($line);
+                  if ($tr_line == "<!--START EDITABLE REGION-->")
+                  {
+                     $inside_editable_region = true;
+                  }
+                  else if ($tr_line == "<!--END EDITABLE REGION-->")
+                  {
+                     $new_file = preg_replace('/html$/', 'php', $file);
+                     add_region_to_db($new_file, $editable_region);
+                     add_div_to_php($new_file, $editable_region);
+                     $editable_region = "";
+                     $inside_editable_region = false;
+                  }
+                  else if ($inside_editable_region)
+                  {
+                     $editable_region .= $line . "\n";
+                  }
+                  else
+                  {
+                     #add each line from html to the new php page
+                     #except the editable regions
+                     $php_page .= $line . "\n";
+                  }
+               }
+               #write out new php files
+               $new_dir = get_absolute_dir($file);
+               $new_file = get_absolute_path($file);
+               $new_file = preg_replace('/html$/', 'php', $new_file);
+               make_new_dir($new_dir);
+               if(!file_put_contents($new_file, $php_page))
+               {
+                  push_status('failed', "could not write file: '$new_file'<br>\n");
+               }
+               else
+               {
+                  #clear out after successfully writing file
+                  $php_page = php_page_header();
+               }
+            }
+            #copy non-html file to correct location
+            else if (filetype($file) == "file" && !preg_match('/html$/', $file))
+            {
+               $new_dir = get_absolute_dir($file);
+               $new_file = get_absolute_path($file);
+               make_new_dir($new_dir);
+        
+               if(!copy($file, $new_file))
+               {
+                  push_status('failed', "could not copy file: '$file' to new destination: $new_file<br>\n");
+               }
+               else
+               {
+                  push_status('passed', "copied: $file to $new_file<br>\n");
+               }
+            }
+         }
+         closedir($dh);
+      }
+   }
+
+   //print results
+   print_status();
+
+} //end if isset post vals
+//show form for entering needed db vals
+else
+{
+#FIXME: add step to create admin account before filling in db info
+$html = '<html>' .
+'<head>' .
+'<link rel="stylesheet" href="../css/box.css" type="text/css"/>' .
+'<style>' .
+'label {' .
+'width: 210px;' .
+'}' .
+'input {' .
+'width: 200px;' .
+'}' .
+'</style>' .
+'</head>' .
+'<body>' .
+'<div id="login-wrapper">' .
+'<div id="status">' .
+'   <p class="alert">Enter the required information to connect to your mysql database.<p>' .
+'   <p class="alert">If you have not yet created a database, do so before completing this step using phpmyadmin or other methods.<p>' .
+'</div>' .
+'<div id="login">' .
+'<form name="db_info" action="setup.php" method="post">' .
+'    <div class="clear">' .
+'       <label for="db_name">Database Name:</label>' .
+'       <input type="text" name="db_name" />' .
+'    </div>' .
+'    <div class="clear">' .
+'       <label for="db_user">Database Username:</label>' .
+'       <input type="text" name="db_user" />' .
+'    </div>' .
+'    <div class="clear">' .
+'       <label for="db_password">Database Password:</label>' .
+'       <input type="password" name="db_password" />' .
+'    </div>' .
+'    <div class="clear">' .
+'       <label for="db_host">Database Host:</label>' .
+'       <input type="text" name="db_host" value="localhost"/>' .
+'    </div>' .
+'    <div class="clear">' .
+'       <input class="submit" type="submit" value="Submit" />' .
+'    </div>' .
+'</form>' .
+'</div>' .
+'</div>' .
+'<body>' .
+'</html>';
+
+echo $html;
 }
 ?>
 
