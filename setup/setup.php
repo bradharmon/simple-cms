@@ -369,56 +369,107 @@ if(isset($_POST['db_user']) && isset($_POST['db_password']) && isset($_POST['db_
    print_status();
 
 } //end if isset post vals
-//show form for entering needed db vals
+//Add new user and show db access details form
+elseif (isset($_POST['email']) && isset($_POST['pass1']) && isset($_POST['pass2']))
+{
+   //Grab user credentials
+   $email =      $_POST['email'];
+   $pass1 =      $_POST['pass1'];
+   $pass2 =      $_POST['pass2'];
+   $changepass = $_POST['changepass'];
+
+   //FIXME: silently create new user
+
+   $html = '<html>' .
+   '<head>' .
+   '<link rel="stylesheet" href="../css/box.css" type="text/css"/>' .
+   '<style>' .
+   'label {' .
+   'width: 210px;' .
+   '}' .
+   'input {' .
+   'width: 200px;' .
+   '}' .
+   '</style>' .
+   '</head>' .
+   '<body>' .
+   '<div id="login-wrapper">' .
+   '<div id="status">' .
+   '   <p class="alert">Step 2 of 2</p>' .
+   '   <p class="alert">Enter the required information to connect to your mysql database.<p>' .
+   '   <p class="alert">If you have not yet created a database, do so before completing this step using phpmyadmin or other methods.<p>' .
+   '   <p class="alert">Installation will begin after the following info is correctly entered</p>' .
+   '</div>' .
+   '<div id="login">' .
+   '<form name="db_info" action="setup.php" method="post">' .
+   '    <div class="clear">' .
+   '       <label for="db_name">Database Name:</label>' .
+   '       <input type="text" name="db_name" />' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <label for="db_user">Database Username:</label>' .
+   '       <input type="text" name="db_user" />' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <label for="db_password">Database Password:</label>' .
+   '       <input type="password" name="db_password" />' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <label for="db_host">Database Host:</label>' .
+   '       <input type="text" name="db_host" value="localhost"/>' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <input class="submit" type="submit" value="Submit" />' .
+   '    </div>' .
+   '</form>' .
+   '</div>' .
+   '</div>' .
+   '<body>' .
+   '</html>';
+
+   echo $html;
+}
+//Show form to create the admin user
 else
 {
-#FIXME: add step to create admin account before filling in db info
-$html = '<html>' .
-'<head>' .
-'<link rel="stylesheet" href="../css/box.css" type="text/css"/>' .
-'<style>' .
-'label {' .
-'width: 210px;' .
-'}' .
-'input {' .
-'width: 200px;' .
-'}' .
-'</style>' .
-'</head>' .
-'<body>' .
-'<div id="login-wrapper">' .
-'<div id="status">' .
-'   <p class="alert">Enter the required information to connect to your mysql database.<p>' .
-'   <p class="alert">If you have not yet created a database, do so before completing this step using phpmyadmin or other methods.<p>' .
-'</div>' .
-'<div id="login">' .
-'<form name="db_info" action="setup.php" method="post">' .
-'    <div class="clear">' .
-'       <label for="db_name">Database Name:</label>' .
-'       <input type="text" name="db_name" />' .
-'    </div>' .
-'    <div class="clear">' .
-'       <label for="db_user">Database Username:</label>' .
-'       <input type="text" name="db_user" />' .
-'    </div>' .
-'    <div class="clear">' .
-'       <label for="db_password">Database Password:</label>' .
-'       <input type="password" name="db_password" />' .
-'    </div>' .
-'    <div class="clear">' .
-'       <label for="db_host">Database Host:</label>' .
-'       <input type="text" name="db_host" value="localhost"/>' .
-'    </div>' .
-'    <div class="clear">' .
-'       <input class="submit" type="submit" value="Submit" />' .
-'    </div>' .
-'</form>' .
-'</div>' .
-'</div>' .
-'<body>' .
-'</html>';
+   $html = '<html>' .
+   '<head>' .
+   '<link rel="stylesheet" href="../css/box.css" type="text/css"/>' .
+   '</head>' .
+   '<body>' .
+   '<div id="login-wrapper">' .
+   '<div id="status">' .
+   '   <p class="alert">Step 1 of 2</p>' .
+   '   <p class="alert">Enter the email address of the admin user and create a password to setup a new admin account<p>' .
+   '</div>' .
+   '<div id="login">' .
+   '<form name="register" action="setup.php" method="post">' .
+   '    <div class="clear">' .
+   '       <label for="email">Email:</label>' .
+   '       <input type="text" name="email" />' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <label for="pass1">Password:</label>' .
+   '       <input type="password" name="pass1" />' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <label for="pass2">Password:</label>' .
+   '       <input type="password" name="pass2" />' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <input style="width:30px; float: left;" type="checkbox" name="changepass" />' .
+   '       <label style="width: auto; float: left; margin-bottom: 15px;" for="changepass">Change password on first login</label>' .
+   '    </div>' .
+   '    <div class="clear">' .
+   '       <input class="submit" type="submit" value="Continue" />' .
+   '    </div>' .
+   '</form>' .
+   '</div>' .
+   '</div>' .
+   '<body>' .
+   '</html>';
 
-echo $html;
+   echo $html;
 }
 ?>
 
