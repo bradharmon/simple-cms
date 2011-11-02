@@ -53,6 +53,8 @@ function add_div_to_php($page, $region)
    #that pulls the html from the database
    $html = str_get_html($region);
    $div = $html->find('div', 0);
+   //FIXME: if the region doesn't have a containing div, make one!
+   if ($div == NULL){echo "Houston, we have a problem";}
    $id = $div->id;
    #assign a unique id to the div if it doesn't have one
    if($id == "")
@@ -79,11 +81,29 @@ function insert_scripts($html)
    $head = $html->find('head', 0);
    $head_html = $head->innertext;
    $head_html .= "\n";
-   $head_html .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/editor.css\" />\n";
-   $head_html .= "<script type=\"text/javascript\" src=\"js/thirdparty/prototype.js\"></script>\n";
-   $head_html .= "<script type=\"text/javascript\" src=\"js/thirdparty/wysihat.js\"></script>\n";
-   $head_html .= "<script type=\"text/javascript\" src=\"js/editor.js\"></script>\n";
+//   $head_html .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/editor.css\" />\n";
+//   $head_html .= "<script type=\"text/javascript\" src=\"js/thirdparty/prototype.js\"></script>\n";
+//   $head_html .= "<script type=\"text/javascript\" src=\"js/thirdparty/wysihat.js\"></script>\n";
+//   $head_html .= "<script type=\"text/javascript\" src=\"js/editor.js\"></script>\n";
+//   $head->innertext = $head_html;
+   $head_html .= '<?php if(isLoggedIn()){ ?>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/aloha.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Format/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Table/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.List/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.HighlightEditables/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.TOC/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/delicious.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/LinkList.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Paste/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.gentics.aloha.plugins.Paste/wordpastehandler.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.example.aloha.plugins.Logout/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/plugins/com.example.aloha.plugins.Save/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="simple-cms/aloha/editor.js"></script>';
+   $head_html .= '<?php } ?>';
    $head->innertext = $head_html;
+
 
    #return explode("\n", $html);
    return $html;
@@ -292,7 +312,8 @@ if(isset($_POST['db_user']) && isset($_POST['db_password']) && isset($_POST['db_
          //get css and js directories as well
          $css_tree = dir_to_array('../css');
          $js_tree = dir_to_array('../js');
-         $dir_tree = array_merge($dir_tree, $css_tree, $js_tree);
+         $aloha_tree = dir_to_array('../aloha');
+         $dir_tree = array_merge($dir_tree, $css_tree, $js_tree, $aloha_tree);
          foreach ($dir_tree as $file)
          {
             //if this is a file with a .html extension
