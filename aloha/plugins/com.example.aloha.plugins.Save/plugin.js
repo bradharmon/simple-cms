@@ -12,7 +12,7 @@ EXAMPLE.DummySavePlugin=new GENTICS.Aloha.Plugin("com.example.aloha.DummySave");
 EXAMPLE.DummySavePlugin.languages=["en","de","fi","fr","it"];
 EXAMPLE.DummySavePlugin.init=function(){
    var that=this;
-   var saveButton=new GENTICS.Aloha.ui.Button({label:this.i18n("save"),onclick:function(){that.save()}});
+   var saveButton=new GENTICS.Aloha.ui.Button({label:"Save",onclick:function(){that.save()}});
    GENTICS.Aloha.Ribbon.addButton(saveButton)
 };
 EXAMPLE.DummySavePlugin.save=function(){
