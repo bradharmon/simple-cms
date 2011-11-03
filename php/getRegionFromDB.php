@@ -15,7 +15,7 @@ function get_region_from_db($page, $id)
    }
 
    #if we're logged in, display the editor
-   if(isLoggedIn()){echo "<div class=\"editor\">\n";}
+   if(isLoggedIn()){echo "<div class=\"editor\" id=\"editor_$id\">\n";}
 
    echo stripslashes($content);
 
