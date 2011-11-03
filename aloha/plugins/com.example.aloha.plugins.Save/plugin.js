@@ -28,10 +28,16 @@ EXAMPLE.DummySavePlugin.save=function(){
    //var regions = {'div': 'data', 'div2' : 'data2'};
    //alert(this.i18n("saveMessage")+"\n\n"+content)
    $.post( "simple-cms/php/submit.php", regions, function(data){
-      alert(data);
+      if($.trim(data) == "success")
+      {
+         //if data saved successfully to db, refresh page
+	 alert("page saved successfully");
+         window.location.reload();
+      }
+      else if($.trim(data) == "fail")
+      {
+         alert("FAILURE saving page " + document.location.href + "\nContact the site admin for more information.");
+      }
    });
-
-   //refresh page
-   //window.location.reload();
 };
 
