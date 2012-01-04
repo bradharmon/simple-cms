@@ -80,23 +80,22 @@ function insert_scripts($html)
 {
    $head = $html->find('head', 0);
    $head_html = $head->innertext;
-   $head_html .= "\n";
-   $head_html .= '<?php if(isLoggedIn()){ ?>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/aloha.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Format/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Table/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.List/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.HighlightEditables/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.TOC/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/delicious.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/LinkList.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Paste/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Paste/wordpastehandler.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.example.aloha.plugins.Save/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.example.aloha.plugins.Logout/plugin.js"></script>\n';
-   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/editor.js"></script>\n';
-   $head_html .= '<?php } ?>\n';
+   $head_html .= '<?php if(isLoggedIn()){ ?>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/aloha.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Format/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Table/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.List/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.HighlightEditables/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.TOC/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/delicious.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Link/LinkList.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Paste/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.gentics.aloha.plugins.Paste/wordpastehandler.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.example.aloha.plugins.Save/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/plugins/com.example.aloha.plugins.Logout/plugin.js"></script>';
+   $head_html .= '<script type="text/javascript" src="/simple-cms/aloha/editor.js"></script>';
+   $head_html .= '<?php } ?>';
    $head->innertext = $head_html;
 
 
