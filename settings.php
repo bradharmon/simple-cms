@@ -23,5 +23,5 @@ define('WEBSITE_DIR', dirname(CMS_DIR));   //simple-cms parent absolute path
 define('ROOT_URL', 'http://'. $_SERVER['HTTP_HOST']);
 define('CMS_URL', 'http://'. $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']));
 //remove trailing '/'
-define('WEBSITE_URL', 'http://'. preg_replace( '/\/$//', '', $_SERVER['HTTP_HOST'] . dirname(dirname(dirname($_SERVER['PHP_SELF'])))) );
+define('WEBSITE_URL', 'http://'. preg_replace( '/\/$/', '', $_SERVER['HTTP_HOST'] . dirname(dirname(dirname($_SERVER['PHP_SELF'])))) );
 ?>
