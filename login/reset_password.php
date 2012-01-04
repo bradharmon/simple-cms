@@ -146,6 +146,7 @@ else if(isset($_GET['email']) && isset($_GET['code']))
            '    </div>' .
            '    <div class="clear">' .
 	   '       <input type="hidden" name="code" value="' . $verification_hash . '"' . '/>' .
+           '       <input type="hidden" name="email" value="' . $email . '"/>' .
            '       <input class="submit" type="submit" value="Reset" />' .
            '    </div>' .
            '</form>' .
